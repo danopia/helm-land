@@ -53,5 +53,10 @@ resource "aws_dynamodb_table_item" "HelmReleases_dns-sync_0-1-0" {
     "Digest" = { "M" = {
       "sha256" = { "S" = aws_s3_bucket_object.dns-sync_0-1-0.metadata.sha256 },
     } },
+
+    "DownloadCount" = { "N" = "0" },
   })
+  lifecycle {
+    ignore_changed = [ item ] # for DownloadCount
+  }
 }
