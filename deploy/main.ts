@@ -12,6 +12,10 @@ async function handler(req: Request) {
 
   try {
 
+    if (url.pathname == '/cloudydeno/artifacthub-repo.yaml') {
+      return new Response('repositoryID: 17dca74f-e060-41a0-908c-434d03631c8d');
+    }
+
     {
       const match = new URLPattern({ pathname: '/:owner/index.yaml' }).exec(url);
       if (match) {
