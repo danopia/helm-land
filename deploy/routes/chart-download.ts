@@ -4,6 +4,8 @@ import {
   presignGetObject,
 } from "../deps.ts";
 
+const deployRegion = Deno.env.get('DENO_REGION');
+
 // https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/ql-reference.update.html
 
 export async function renderChartDownload(ownerId: string, chartName: string, version: string, userAgent: string | null) {
@@ -38,6 +40,7 @@ export async function renderChartDownload(ownerId: string, chartName: string, ve
         'ChartVersion':?,
         'GrabbedAt':?,
         'UserAgent':?,
+        'DeployRegion':?,
         'RemoveAt':?}`,
       Parameters: [
         { S: ownerId },
@@ -46,6 +49,7 @@ export async function renderChartDownload(ownerId: string, chartName: string, ve
         { S: version },
         { S: new Date().toISOString() },
         userAgent ? { S: userAgent } : { NULL: true },
+        deployRegion ? { S: deployRegion } : { NULL: true },
         { N: `${removalTimestamp}` },
       ],
     }),
