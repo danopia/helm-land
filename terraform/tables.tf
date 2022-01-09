@@ -49,3 +49,28 @@ resource "aws_dynamodb_table" "HelmReleases" {
     projection_type = "ALL"
   }
 }
+
+resource "aws_dynamodb_table" "HelmGrabs" {
+  name      = "HelmGrabs"
+  hash_key  = "ChartKey"
+  range_key = "GrabbedAt"
+
+  billing_mode = "PAY_PER_REQUEST"
+  table_class  = "STANDARD"
+  tags         = {}
+
+  attribute {
+    name = "ChartKey"
+    type = "S"
+  }
+
+  attribute {
+    name = "GrabbedAt"
+    type = "S"
+  }
+
+  ttl {
+    attribute_name = "RemoveAfterSeconds" # TODO: RemoveAt
+    enabled        = false
+  }
+}

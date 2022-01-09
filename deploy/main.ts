@@ -25,7 +25,7 @@ async function handler(req: Request) {
       if (match) {
         const {owner, name, filename} = match.pathname.groups;
         if (filename.startsWith(`${name}-`)) {
-          const resp = await renderChartDownload(owner, name, filename.slice(name.length + 1));
+          const resp = await renderChartDownload(owner, name, filename.slice(name.length + 1), userAgent);
           if (resp) return resp;
         }
       }

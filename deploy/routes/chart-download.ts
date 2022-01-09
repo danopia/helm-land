@@ -4,7 +4,9 @@ import {
   presignGetObject,
 } from "../deps.ts";
 
-export async function renderChartDownload(ownerId: string, chartName: string, version: string) {
+// https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/ql-reference.update.html
+
+export async function renderChartDownload(ownerId: string, chartName: string, version: string, userAgent: string | null) {
   const chartKey = `${encodeURIComponent(ownerId)}/${encodeURIComponent(chartName)}`;
   const chart = await dynamodb.executeStatement({
     Statement: `SELECT Download FROM HelmReleases WHERE ChartKey=? AND ChartVersion=?`,
@@ -22,10 +24,32 @@ export async function renderChartDownload(ownerId: string, chartName: string, ve
   }
   const signedUrl = await presignGetObject(hostname, pathname.slice(1), params);
 
-  await dynamodb.executeStatement({
-    Statement: `UPDATE HelmReleases SET DownloadCount = DownloadCount + 1 WHERE ChartKey=? AND ChartVersion=?`,
-    Parameters: [{ S: chartKey }, { S: version }],
-  });
+  const removalTimestamp = Math.floor(Date.now() / 1000) + (365 * 24 * 60);
+  await Promise.all([
+    dynamodb.executeStatement({
+      Statement: `UPDATE HelmReleases SET DownloadCount = DownloadCount + 1 WHERE ChartKey=? AND ChartVersion=?`,
+      Parameters: [{ S: chartKey }, { S: version }],
+    }),
+    dynamodb.executeStatement({
+      Statement: `INSERT INTO HelmGrabs VALUE {
+        'ChartOwner':?,
+        'ChartName':?,
+        'ChartKey':?,
+        'ChartVersion':?,
+        'GrabbedAt':?,
+        'UserAgent':?,
+        'RemoveAt':?}`,
+      Parameters: [
+        { S: ownerId },
+        { S: chartName },
+        { S: chartKey },
+        { S: version },
+        { S: new Date().toISOString() },
+        userAgent ? { S: userAgent } : { NULL: true },
+        { N: `${removalTimestamp}` },
+      ],
+    }),
+  ]);
 
   return new Response('Redirecting!', {
     status: 302,

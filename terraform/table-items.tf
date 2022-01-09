@@ -57,6 +57,6 @@ resource "aws_dynamodb_table_item" "HelmReleases_dns-sync_0-1-0" {
     "DownloadCount" = { "N" = "0" },
   })
   lifecycle {
-    ignore_changed = [ item ] # for DownloadCount
+    ignore_changes = [ item ] # for DownloadCount
   }
 }

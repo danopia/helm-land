@@ -1,10 +1,15 @@
-import { ApiFactory } from "https://deno.land/x/aws_api@v0.5.0/client/mod.ts";
+// import { ApiFactory } from "https://deno.land/x/aws_api@v0.5.0/client/mod.ts";
+// import {
+//   DefaultCredentialsProvider,
+//   getDefaultRegion,
+// } from "https://deno.land/x/aws_api@v0.5.0/client/credentials.ts";
+import { ApiFactory } from "https://raw.githubusercontent.com/cloudydeno/deno-aws_api/e9a755913de0054473f272a85cccc340dbe5bf11/lib/client/mod.ts";
 import {
   DefaultCredentialsProvider,
   getDefaultRegion,
-} from "https://deno.land/x/aws_api@v0.5.0/client/credentials.ts";
+} from "https://raw.githubusercontent.com/cloudydeno/deno-aws_api/e9a755913de0054473f272a85cccc340dbe5bf11/lib/client/credentials.ts";
 
-import { DynamoDB } from "https://aws-api.deno.dev/v0.2/services/dynamodb.ts?actions=ExecuteStatement";
+import { DynamoDB } from "https://aws-api.deno.dev/v0.3/services/dynamodb.ts?actions=ExecuteStatement";
 export const dynamodb = new ApiFactory().makeNew(DynamoDB);
 
 export const objectBucket = Deno.env.get('CHART_BUCKET');
