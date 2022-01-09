@@ -70,7 +70,7 @@ resource "aws_dynamodb_table" "HelmGrabs" {
   }
 
   ttl {
-    attribute_name = "RemoveAfterSeconds" # TODO: RemoveAt
-    enabled        = false
+    attribute_name = "RemoveAt"
+    enabled        = true
   }
 }
