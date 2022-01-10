@@ -52,11 +52,79 @@ resource "aws_dynamodb_table_item" "HelmReleases_dns-sync_0-1-0" {
     ] },
     "Digest" = { "M" = {
       "sha256" = { "S" = aws_s3_bucket_object.dns-sync_0-1-0.metadata.sha256 },
+      "oci" = { "S" = "sha256:${sha256(local.manifest_0-1-0)}" },
     } },
 
     "DownloadCount" = { "N" = "0" },
   })
   lifecycle {
-    ignore_changes = [ item ] # for DownloadCount
+    ignore_changes = [item] # for DownloadCount
   }
+}
+
+locals {
+  config_0-1-0 = jsonencode({
+    name        = "dns-sync",
+    version     = "0.1.0",
+    description = "Manage hosted DNS providers using a Kubernetes control plane",
+    apiVersion  = "v2",
+    appVersion  = "latest",
+    type        = "application",
+  })
+  manifest_0-1-0 = jsonencode({
+    schemaVersion = 2,
+    config = {
+      mediaType = "application/vnd.cncf.helm.config.v1+json",
+      digest    = "sha256:${sha256(local.config_0-1-0)}",
+      size      = 175
+    },
+    layers = [
+      {
+        mediaType = "application/vnd.cncf.helm.chart.content.v1.tar+gzip",
+        digest    = "sha256:${aws_s3_bucket_object.dns-sync_0-1-0.metadata.sha256}",
+        size      = 2597
+      }
+    ],
+  })
+}
+resource "aws_dynamodb_table_item" "HelmOCI_dns-sync_0-1-0_config" {
+  table_name = aws_dynamodb_table.HelmOCI.name
+  hash_key   = aws_dynamodb_table.HelmOCI.hash_key
+  range_key  = aws_dynamodb_table.HelmOCI.range_key
+
+  item = jsonencode({
+    "ChartKey"     = { "S" = "cloudydeno/dns-sync" },
+    "ChartVersion" = { "S" = "0.1.0" },
+    "Digest"       = { "S" = "sha256:${sha256(local.config_0-1-0)}" },
+    "Type"         = { "S" = "config.v1" },
+    "Data"         = { "S" = local.config_0-1-0 },
+  })
+}
+resource "aws_dynamodb_table_item" "HelmOCI_dns-sync_0-1-0_content" {
+  table_name = aws_dynamodb_table.HelmOCI.name
+  hash_key   = aws_dynamodb_table.HelmOCI.hash_key
+  range_key  = aws_dynamodb_table.HelmOCI.range_key
+
+  item = jsonencode({
+    "ChartKey"     = { "S" = "cloudydeno/dns-sync" },
+    "ChartVersion" = { "S" = "0.1.0" },
+    "Digest"       = { "S" = "sha256:${aws_s3_bucket_object.dns-sync_0-1-0.metadata.sha256}" },
+    "Type"         = { "S" = "content.v1" },
+    "Storage" = { "SS" = [
+      "s3://${aws_s3_bucket.main.id}/${aws_s3_bucket_object.dns-sync_0-1-0.key}?versionId=${aws_s3_bucket_object.dns-sync_0-1-0.version_id}",
+    ] },
+  })
+}
+resource "aws_dynamodb_table_item" "HelmOCI_dns-sync_0-1-0_manifest" {
+  table_name = aws_dynamodb_table.HelmOCI.name
+  hash_key   = aws_dynamodb_table.HelmOCI.hash_key
+  range_key  = aws_dynamodb_table.HelmOCI.range_key
+
+  item = jsonencode({
+    "ChartKey"     = { "S" = "cloudydeno/dns-sync" },
+    "ChartVersion" = { "S" = "0.1.0" },
+    "Digest"       = { "S" = "sha256:${sha256(local.manifest_0-1-0)}" },
+    "Type"         = { "S" = "manifest.v1" },
+    "Data"         = { "S" = local.manifest_0-1-0 },
+  })
 }

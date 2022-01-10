@@ -3,7 +3,7 @@ import { serve } from "./deps.ts";
 
 import { renderIndexYaml } from "./routes/index-yaml.ts";
 import { renderChartDownload } from "./routes/chart-download.ts";
-import { renderOciManifest } from "./routes/oci.ts";
+import * as OCI from "./routes/oci.ts";
 
 async function handler(req: Request) {
   const url = new URL(req.url);
@@ -25,11 +25,19 @@ async function handler(req: Request) {
       }
     }
 
+    // 'experimental' OCI stuff
+    // {
+    //   const match = new URLPattern({ pathname: '/v2/token' }).exec(url);
+    //   if (match) {
+    //     const resp = await OCI.renderOciToken(url);
+    //     if (resp) return resp;
+    //   }
+    // }
     {
-      const match = new URLPattern({ pathname: '/v2/:owner/:chart/manifests/:version' }).exec(url);
+      const match = new URLPattern({ pathname: '/v2/:owner/:chart/:type(manifest|blob)s/:lookup' }).exec(url);
       if (match) {
-        const {owner, chart, version} = match.pathname.groups;
-        const resp = await renderOciManifest(url, owner, chart, version, req.headers.get('authorization'));
+        const {owner, chart, type, lookup} = match.pathname.groups;
+        const resp = await OCI.renderOciManifest(url, req.headers, owner, chart, type, lookup);
         if (resp) return resp;
       }
     }
@@ -39,7 +47,7 @@ async function handler(req: Request) {
       if (match) {
         const {owner, chart, filename} = match.pathname.groups;
         if (filename.startsWith(`${chart}-`)) {
-          const resp = await renderChartDownload(owner, chart, filename.slice(chart.length + 1), userAgent);
+          const resp = await renderChartDownload(owner, chart, filename.slice(chart.length + 1), url.hostname, userAgent);
           if (resp) return resp;
         }
       }
