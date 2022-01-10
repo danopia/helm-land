@@ -33,6 +33,7 @@ export async function presignGetObject(bucket: string, key: string, params?: Rec
     host: `${bucket}.s3.dualstack.${getDefaultRegion()}.amazonaws.com`,
     objectPath: `/${key}`,
     queryParams: params,
+    expiresIn: 300,
   });
 }
 
