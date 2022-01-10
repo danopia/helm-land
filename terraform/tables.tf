@@ -74,3 +74,23 @@ resource "aws_dynamodb_table" "HelmGrabs" {
     enabled        = true
   }
 }
+
+resource "aws_dynamodb_table" "HelmOCI" {
+  name      = "HelmOCI"
+  hash_key  = "ChartKey"
+  range_key = "Digest"
+
+  billing_mode = "PAY_PER_REQUEST"
+  table_class  = "STANDARD"
+  tags         = {}
+
+  attribute {
+    name = "ChartKey"
+    type = "S"
+  }
+
+  attribute {
+    name = "Digest"
+    type = "S"
+  }
+}

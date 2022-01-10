@@ -25,6 +25,7 @@ export async function renderIndexYaml(baseUrl: string, ownerId: string) {
       Maintainers,
     } = chartRecord;
 
+    // TODO: pagination
     const versions = await dynamodb.executeStatement({
       Statement: `SELECT * FROM HelmReleases.ByReleasedAt WHERE ChartKey=? ORDER BY ReleasedAt DESC`,
       Parameters: [ ChartKey! ],
@@ -81,6 +82,10 @@ export async function renderIndexYaml(baseUrl: string, ownerId: string) {
           chunks.push(`    - ${JSON.stringify(download)}`);
         }
       }
+      // maybe someday helm will accept OCI URLs here
+      // if (versionRecord.Digest?.M?.oci?.S) {
+      //   chunks.push(`    - ${JSON.stringify(`${baseUrl.replace(/^[^:]+:/, 'oci:')}${encodeURIComponent(`${name?.S}`)}`)}`);
+      // }
     }
   }
 
