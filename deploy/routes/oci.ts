@@ -1,5 +1,33 @@
-import { dynamodb, objectUrlPrefix } from "../deps.ts";
+import { dynamodb, semver } from "../deps.ts";
 import { presignGrabUrl, recordGrab } from "../lib/grab.ts";
+
+export async function resolveVersionSpec(chartKey: string, versionSpec: string) {
+  console.log({versionSpec})
+  if (semver.valid(versionSpec) || !semver.validRange(versionSpec)) {
+    return await dynamodb.executeStatement({
+      Statement: `SELECT Digest FROM HelmReleases WHERE ChartKey=? AND ChartVersion=?`,
+      Parameters: [{ S: chartKey }, { S: versionSpec }],
+    }).then(x => x.Items?.[0]);
+  }
+
+  // TODO: pagination
+  const versions = await dynamodb.executeStatement({
+    Statement: `SELECT * FROM HelmReleases.ByReleasedAt WHERE ChartKey=?`,
+    Parameters: [{ S: chartKey }],
+  }).then(x => x.Items ?? []);
+
+  const range = new semver.Range(versionSpec);
+  const [choice] = versions
+    .map(x => ({version: x.ChartVersion?.S ?? '', record: x}))
+    .filter(x => x.version && range.test(x.version))
+    .sort((a, b) => semver.lt(a.version, b.version) ? 1 : -1);
+  if (!choice) {
+    console.log(` -> No versions of ${chartKey} matched ${versionSpec}`);
+  } else {
+    console.log(` -> Resolved "${versionSpec}" to ${chartKey}@${choice.version}`);
+    return choice.record;
+  }
+}
 
 export async function renderOciManifest(requestUrl: URL, headers: Headers, ownerId: string, chartName: string, type: string, lookup: string) {
   const chartKey = `${encodeURIComponent(ownerId)}/${encodeURIComponent(chartName)}`;
@@ -17,10 +45,8 @@ export async function renderOciManifest(requestUrl: URL, headers: Headers, owner
     return await serveLayer(chartKey, type, lookup, requestUrl.hostname, headers.get('user-agent'));
   }
 
-  const release = await dynamodb.executeStatement({
-    Statement: `SELECT Digest FROM HelmReleases WHERE ChartKey=? AND ChartVersion=?`,
-    Parameters: [{ S: chartKey }, { S: lookup }],
-  }).then(x => x.Items?.[0]);
+  const versionSpec = lookup.replaceAll('_', '+'); // + isn't valid in OCI, _ isn't valid in Helm
+  const release = await resolveVersionSpec(chartKey, versionSpec);
   if (!release) return null;
 
   const digest = release?.Digest?.M?.oci?.S;

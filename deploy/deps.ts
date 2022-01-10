@@ -35,3 +35,5 @@ export async function presignGetObject(bucket: string, key: string, params?: Rec
     queryParams: params,
   });
 }
+
+export * as semver from "https://deno.land/x/semver@v1.4.0/mod.ts";

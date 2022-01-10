@@ -37,7 +37,7 @@ async function handler(req: Request) {
       const match = new URLPattern({ pathname: '/v2/:owner/:chart/:type(manifest|blob)s/:lookup' }).exec(url);
       if (match) {
         const {owner, chart, type, lookup} = match.pathname.groups;
-        const resp = await OCI.renderOciManifest(url, req.headers, owner, chart, type, lookup);
+        const resp = await OCI.renderOciManifest(url, req.headers, owner, chart, type, decodeURIComponent(lookup));
         if (resp) return resp;
       }
     }
