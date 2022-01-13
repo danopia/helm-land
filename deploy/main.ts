@@ -3,7 +3,7 @@ import { serve } from "./deps.ts";
 
 import { renderIndexYaml } from "./routes/index-yaml.ts";
 import { renderChartDownload } from "./routes/chart-download.ts";
-import * as OCI from "./routes/oci.ts";
+import * as OCIPull from "./routes/oci-pull.ts";
 
 async function handler(req: Request) {
   const url = new URL(req.url);
@@ -37,7 +37,7 @@ async function handler(req: Request) {
       const match = new URLPattern({ pathname: '/v2/:owner/:chart/tags/list' }).exec(url);
       if (match) {
         const {owner, chart} = match.pathname.groups;
-        const resp = await OCI.renderOciTagList(owner, chart);
+        const resp = await OCIPull.renderOciTagList(owner, chart);
         if (resp) return resp;
       }
     }
@@ -45,7 +45,7 @@ async function handler(req: Request) {
       const match = new URLPattern({ pathname: '/v2/:owner/:chart/:type(manifest|blob)s/:lookup' }).exec(url);
       if (match) {
         const {owner, chart, type, lookup} = match.pathname.groups;
-        const resp = await OCI.renderOciManifest(url, req.headers, owner, chart, type, decodeURIComponent(lookup));
+        const resp = await OCIPull.renderOciManifest(url, req.headers, owner, chart, type, decodeURIComponent(lookup));
         if (resp) return resp;
       }
     }
