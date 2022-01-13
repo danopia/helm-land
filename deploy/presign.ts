@@ -12,7 +12,7 @@ interface GetSignedUrlOptions {
   accessKeyId: string
   secretAccessKey: string
   sessionToken?: string
-  method?: 'GET' | 'PUT'
+  method?: 'GET' | 'PUT' | 'HEAD'
   region?: string
   expiresIn?: number
   date?: Date

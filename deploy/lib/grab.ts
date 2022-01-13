@@ -1,6 +1,6 @@
 import { dynamodb, objectUrlPrefix, presignGetObject } from "../deps.ts";
 
-export async function presignGrabUrl(urlOptions: string[]) {
+export async function presignGrabUrl(method: 'GET' | 'HEAD', urlOptions: string[]) {
   const knownUrl = urlOptions.find(x => x.startsWith(objectUrlPrefix));
   if (!knownUrl) return null;
 
@@ -10,7 +10,7 @@ export async function presignGrabUrl(urlOptions: string[]) {
     params.versionId = searchParams.get('versionId')!;
   }
 
-  return await presignGetObject(hostname, pathname.slice(1), params);
+  return await presignGetObject(method, hostname, pathname.slice(1), params);
 }
 
 const deployRegion = Deno.env.get('DENO_REGION');

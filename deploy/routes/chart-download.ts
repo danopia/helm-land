@@ -3,7 +3,7 @@ import {
 } from "../deps.ts";
 import { presignGrabUrl, recordGrab } from "../lib/grab.ts";
 
-export async function renderChartDownload(ownerId: string, chartName: string, version: string, httpHost: string, userAgent: string | null) {
+export async function renderChartDownload(method: 'GET' | 'HEAD', ownerId: string, chartName: string, version: string, httpHost: string, userAgent: string | null) {
   const chartKey = `${encodeURIComponent(ownerId)}/${encodeURIComponent(chartName)}`;
   const chart = await dynamodb.executeStatement({
     Statement: `SELECT Download FROM HelmReleases WHERE ChartKey=? AND ChartVersion=?`,
@@ -11,7 +11,7 @@ export async function renderChartDownload(ownerId: string, chartName: string, ve
   }).then(x => x.Items?.[0]);
   if (!chart) return null;
 
-  const signedUrl = await presignGrabUrl(chart.Download?.SS ?? []);
+  const signedUrl = await presignGrabUrl(method, chart.Download?.SS ?? []);
   if (!signedUrl) return null;
 
   await recordGrab({
