@@ -29,6 +29,28 @@ export async function resolveVersionSpec(chartKey: string, versionSpec: string) 
   }
 }
 
+export async function renderOciTagList(ownerId: string, chartName: string) {
+  const chartKey = `${encodeURIComponent(ownerId)}/${encodeURIComponent(chartName)}`;
+
+  // TODO: pagination
+  // https://github.com/opencontainers/distribution-spec/blob/main/spec.md#content-discovery
+  const versions = await dynamodb.executeStatement({
+    Statement: `SELECT ChartVersion FROM HelmReleases WHERE ChartKey=?`,
+    Parameters: [{ S: chartKey }],
+  }).then(x => x.Items ?? []);
+
+  return new Response(JSON.stringify({
+    name: chartName,
+    tags: versions
+      .map(x => x.ChartVersion?.S ?? '')
+      .filter(x => x)
+      .map(x => x.replaceAll('_', '+')),
+  }), {
+    headers: {
+      'content-type': 'application/json',
+    }});
+}
+
 export async function renderOciManifest(requestUrl: URL, headers: Headers, ownerId: string, chartName: string, type: string, lookup: string) {
   const chartKey = `${encodeURIComponent(ownerId)}/${encodeURIComponent(chartName)}`;
 

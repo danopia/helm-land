@@ -34,6 +34,14 @@ async function handler(req: Request) {
     //   }
     // }
     {
+      const match = new URLPattern({ pathname: '/v2/:owner/:chart/tags/list' }).exec(url);
+      if (match) {
+        const {owner, chart} = match.pathname.groups;
+        const resp = await OCI.renderOciTagList(owner, chart);
+        if (resp) return resp;
+      }
+    }
+    {
       const match = new URLPattern({ pathname: '/v2/:owner/:chart/:type(manifest|blob)s/:lookup' }).exec(url);
       if (match) {
         const {owner, chart, type, lookup} = match.pathname.groups;
@@ -41,7 +49,6 @@ async function handler(req: Request) {
         if (resp) return resp;
       }
     }
-
     {
       const match = new URLPattern({ pathname: '/:owner/:chart/:filename.tgz' }).exec(url);
       if (match) {
