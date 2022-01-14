@@ -4,6 +4,26 @@ import { OciStore, RequestContext } from "./oci-store.ts";
 
 export class OciStoreHelm implements OciStore {
 
+  async requiresAuth(ctx: RequestContext): Promise<boolean> {
+    return ctx.action != 'pull';
+  }
+  async checkAuthToken(ctx: RequestContext): Promise<boolean> {
+    // return ctx.bearerToken == 'hiiiiiiiiiiiiiiiiiiiiiiiiiii';
+    return false;
+  }
+  async getAuthToken(params: URLSearchParams, headers: Headers): Promise<string | null> {
+    // TODO: let some people get tokens!
+    // anon: params has scope=, service=
+    // login: params has account=<user>, client_id=docker, offline_token=true, service=
+    const authHeader = headers.get('authorization');
+    console.log('getAuthToken', {params: params.toString, headers})
+    if (authHeader == 'Basic aGk6aGk=') { // hi:hi
+      return 'hiiiiiiiiiiiiiiiiiiiiiiiiiii';
+    } else {
+      return null;
+    }
+  }
+
   getBlob(ctx: RequestContext, digest: string): Promise<Response | null> {
     return serveLayer(ctx, 'blob', digest);
   }

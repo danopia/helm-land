@@ -1,5 +1,11 @@
 // https://github.com/opencontainers/distribution-spec/blob/main/spec.md#endpoints
 
+export interface OciStore_Auth {
+  requiresAuth(ctx: RequestContext): Promise<boolean>;
+  checkAuthToken(ctx: RequestContext): Promise<boolean>;
+  getAuthToken(params: URLSearchParams, headers: Headers): Promise<string | null>;
+}
+
 export interface OciStore_Pull {
   getBlob(ctx: RequestContext, digest: string): Promise<Response | null>;
   getManifest(ctx: RequestContext, digest: string): Promise<Response | null>;
@@ -25,17 +31,23 @@ export interface OciStore_Management {
 }
 
 export type OciStore =
+  & OciStore_Auth
   & OciStore_Pull
   // & OciStore_Push
   & OciStore_Discovery
   // & OciStore_Management
 ;
 
+// export type OciScope =
+//   | ['repository', string, 'pull' | 'push']
+// ;
+
 export interface RequestContext {
   repoName: string; // joined by slash
   repoNames: string[]; // split by slash
+  action: 'pull' | 'push';
   isHeadersOnly: boolean;
+  bearerToken: string | null;
   userAgent: string | null;
   httpHost: string;
-
 }
