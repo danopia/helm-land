@@ -7,7 +7,7 @@ export async function routeOciRequest(store: OciStore, request: Request, url: UR
     if (request.method !== 'GET') return new Response('Must be GET', {
       status: 405,
     });
-    const token = await store.getAuthToken(url.searchParams, request.headers);
+    const token = await store.getAuthToken(url.searchParams, request.headers.get('authorization'));
     return tokenResponse(token);
   }
 

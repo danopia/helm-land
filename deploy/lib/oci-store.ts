@@ -3,7 +3,7 @@
 export interface OciStore_Auth {
   requiresAuth(ctx: RequestContext): Promise<boolean>;
   checkAuthToken(ctx: RequestContext): Promise<boolean>;
-  getAuthToken(params: URLSearchParams, headers: Headers): Promise<string | null>;
+  getAuthToken(params: URLSearchParams, authHeader: string | null): Promise<string | null>;
 }
 
 export interface OciStore_Pull {

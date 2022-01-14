@@ -11,12 +11,11 @@ export class OciStoreHelm implements OciStore {
     // return ctx.bearerToken == 'hiiiiiiiiiiiiiiiiiiiiiiiiiii';
     return false;
   }
-  async getAuthToken(params: URLSearchParams, headers: Headers): Promise<string | null> {
+  async getAuthToken(params: URLSearchParams, authHeader: string | null): Promise<string | null> {
     // TODO: let some people get tokens!
     // anon: params has scope=, service=
     // login: params has account=<user>, client_id=docker, offline_token=true, service=
-    const authHeader = headers.get('authorization');
-    console.log('getAuthToken', {params: params.toString, headers})
+    console.log('getAuthToken', params.toString, authHeader)
     if (authHeader == 'Basic aGk6aGk=') { // hi:hi
       return 'hiiiiiiiiiiiiiiiiiiiiiiiiiii';
     } else {
