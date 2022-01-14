@@ -1,4 +1,4 @@
-#!/usr/bin/env -S deno run --allow-env --allow-net=0.0.0.0:8000,dynamodb.eu-central-1.amazonaws.com
+#!/usr/bin/env -S deno run --allow-env --allow-net=0.0.0.0:8000,dynamodb.eu-central-1.amazonaws.com,token.actions.githubusercontent.com
 import { serve } from "./deps.ts";
 
 import { renderIndexYaml } from "./routes/index-yaml.ts";

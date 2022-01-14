@@ -1,4 +1,5 @@
 import { verify } from "https://deno.land/x/djwt@v2.4/mod.ts";
+import { crypto } from "https://deno.land/std@0.121.0/crypto/mod.ts";
 
 export async function validateOidcJwt(jwt: string) {
   const parts = jwt.split('.');
