@@ -37,7 +37,7 @@ export class OciStoreHelm implements OciStore {
 
     if (authHeader?.toLowerCase().startsWith('basic ')) {
       const basicAuth = atob(authHeader.slice(6));
-      if (!authHeader.startsWith('oidc:')) return null;
+      if (!basicAuth.startsWith('oidc:')) return null;
       console.log(basicAuth)
 
       const jwtData = await validateOidcJwt(basicAuth.slice(5)).catch(err =>
