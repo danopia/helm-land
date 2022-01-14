@@ -94,3 +94,22 @@ resource "aws_dynamodb_table" "HelmOCI" {
     type = "S"
   }
 }
+
+resource "aws_dynamodb_table" "HelmTokens" {
+  name      = "HelmTokens"
+  hash_key  = "BearerToken"
+
+  billing_mode = "PAY_PER_REQUEST"
+  table_class  = "STANDARD"
+  tags         = {}
+
+  attribute {
+    name = "BearerToken"
+    type = "S"
+  }
+
+  ttl {
+    attribute_name = "RemoveAt"
+    enabled        = true
+  }
+}

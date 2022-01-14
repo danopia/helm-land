@@ -4,9 +4,14 @@ export async function routeOciRequest(store: OciStore, request: Request, url: UR
   const pathParts = url.pathname.split('/').slice(2);
 
   if (pathParts.length == 1 && pathParts[0] == 'token') {
-    if (request.method !== 'GET') return new Response('Must be GET', {
-      status: 405,
-    });
+    if (request.method !== 'GET')
+      return new Response('Must be GET', {
+        status: 405,
+      });
+    if (url.searchParams.get('service') != url.hostname)
+      return new Response('I expected more parameters', {
+        status: 400,
+      });
     const token = await store.getAuthToken(url.searchParams, request.headers.get('authorization'));
     return tokenResponse(token);
   }
@@ -16,7 +21,12 @@ export async function routeOciRequest(store: OciStore, request: Request, url: UR
   const parameter = pathParts.pop();
   const route = pathParts.pop();
 
-  const action = ['HEAD', 'GET'].includes(request.method) ? 'pull' : 'push';
+  const action =
+      pathParts.length == 0
+    ? 'index'
+    : ['HEAD', 'GET'].includes(request.method)
+    ? 'pull'
+    : 'push';
   console.log('oci:', {action, pathParts, parameter, route, isDir});
 
   const context: RequestContext = {
@@ -32,6 +42,7 @@ export async function routeOciRequest(store: OciStore, request: Request, url: UR
   if (context.bearerToken) {
     const isOk = await store.checkAuthToken(context);
     if (!isOk) context.bearerToken = null;
+    else console.log('Auth checks out!');
   }
 
   if (!context.bearerToken) {

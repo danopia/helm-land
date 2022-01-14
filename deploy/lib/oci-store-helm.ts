@@ -1,26 +1,74 @@
 import { AttributeValue, dynamodb, ExecuteStatementInput } from "../deps.ts";
 import { presignGrabUrl, recordGrab } from "../lib/grab.ts";
 import { OciStore, RequestContext } from "./oci-store.ts";
+import { validateOidcJwt } from "./oidc.ts";
+import { generateId, issueToken, lookupToken } from "./tokens.ts";
 
 export class OciStoreHelm implements OciStore {
 
   async requiresAuth(ctx: RequestContext): Promise<boolean> {
     return ctx.action != 'pull';
   }
+
   async checkAuthToken(ctx: RequestContext): Promise<boolean> {
-    // return ctx.bearerToken == 'hiiiiiiiiiiiiiiiiiiiiiiiiiii';
-    return false;
+    if (!ctx.bearerToken) return false;
+    const tokenInfo = await lookupToken(ctx.bearerToken);
+    if (!tokenInfo) return false;
+
+    if (ctx.action == 'index') {
+      return true;
+    }
+    if (!tokenInfo.scope) return false;
+
+    const [type, key, actions] = tokenInfo.scope.split(':');
+    if (!actions) return false;
+    const actionList = actions.split(',');
+
+    if (type !== 'repository') return false;
+    if (key != ctx.repoName) return false;
+    if (!actionList.includes(ctx.action)) return false;
+    return true;
   }
+
   async getAuthToken(params: URLSearchParams, authHeader: string | null): Promise<string | null> {
-    // TODO: let some people get tokens!
     // anon: params has scope=, service=
     // login: params has account=<user>, client_id=docker, offline_token=true, service=
-    console.log('getAuthToken', params.toString, authHeader)
-    if (authHeader == 'Basic aGk6aGk=') { // hi:hi
-      return 'hiiiiiiiiiiiiiiiiiiiiiiiiiii';
-    } else {
+    const scope = params.get('scope');
+
+    if (authHeader?.startsWith('basic ')) {
+      const basicAuth = atob(authHeader.slice(6));
+      if (!authHeader.startsWith('oidc:')) return null;
+
+      const jwtData = await validateOidcJwt(basicAuth.slice(5)).catch(err =>
+        console.log(`JWT didn't verify: ${err.message || err}`));
+      if (!jwtData) return null;
+
+      if (jwtData.iss?.startsWith('https://')
+       && jwtData.aud === 'https://helm-land.deno.dev'
+       && typeof jwtData.sub === 'string'
+       && typeof jwtData.exp === 'number') {
+
+        switch (scope) {
+          case "repository:cloudydeno/dns-sync:pull,push":
+            if (jwtData.iss !== 'https://token.actions.githubusercontent.com') return null;
+            if (jwtData.sub !== 'repo:danopia/helm-land-push-test:ref:refs/heads/main') return null;
+            break;
+          case null:
+            // let anyone auth to the index if their auth looks reasonable
+            break;
+          default:
+            return null;
+        }
+
+        return await issueToken(jwtData, scope);
+      }
+
+    } else if (authHeader) {
       return null;
     }
+
+    if (scope?.endsWith(':pull')) return 'public-pull';
+    return null;
   }
 
   getBlob(ctx: RequestContext, digest: string): Promise<Response | null> {

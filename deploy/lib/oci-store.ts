@@ -45,7 +45,7 @@ export type OciStore =
 export interface RequestContext {
   repoName: string; // joined by slash
   repoNames: string[]; // split by slash
-  action: 'pull' | 'push';
+  action: 'index' | 'pull' | 'push';
   isHeadersOnly: boolean;
   bearerToken: string | null;
   userAgent: string | null;
