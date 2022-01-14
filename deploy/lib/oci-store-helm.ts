@@ -35,7 +35,7 @@ export class OciStoreHelm implements OciStore {
     // login: params has account=<user>, client_id=docker, offline_token=true, service=
     const scope = params.get('scope');
 
-    if (authHeader?.startsWith('basic ')) {
+    if (authHeader?.toLowerCase().startsWith('basic ')) {
       const basicAuth = atob(authHeader.slice(6));
       if (!authHeader.startsWith('oidc:')) return null;
       console.log(basicAuth)
