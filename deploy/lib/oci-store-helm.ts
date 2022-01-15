@@ -50,7 +50,7 @@ export class OciStoreHelm implements OciStore {
        && typeof jwtData.exp === 'number') {
 
         switch (scope) {
-          case "repository:cloudydeno/dns-sync:pull,push":
+          case "repository:danopia/example:pull,push":
             if (jwtData.iss !== 'https://token.actions.githubusercontent.com') return null;
             if (jwtData.sub !== 'repo:danopia/helm-land-push-test:ref:refs/heads/main') return null;
             break;

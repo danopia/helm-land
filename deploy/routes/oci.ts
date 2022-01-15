@@ -13,6 +13,7 @@ export async function routeOciRequest(store: OciStore, request: Request, url: UR
         status: 400,
       });
     const token = await store.getAuthToken(url.searchParams, request.headers.get('authorization'));
+    if (!token) console.log('-->', 'Token request declined');
     return tokenResponse(token);
   }
 

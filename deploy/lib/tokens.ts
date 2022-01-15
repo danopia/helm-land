@@ -34,6 +34,7 @@ export async function issueToken(jwtData: Payload, scope: string | null) {
       { N: `${jwtData.exp}` },
     ],
   });
+  console.log('-->', 'Issued token', token, 'to', {scope, subject:jwtData.sub, issuer:jwtData.iss})
   return token;
 }
 
