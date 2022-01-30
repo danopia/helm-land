@@ -1,20 +1,16 @@
+import { dynamodb, JwtPayload } from "../deps.ts";
+
 // https://stackoverflow.com/a/27747377/3582903
-
-import { Payload } from "https://deno.land/x/djwt@v2.4/mod.ts";
-import { dynamodb } from "../deps.ts";
-
-function dec2hex (dec: number) {
+function dec2hex(dec: number) {
   return dec.toString(16).padStart(2, "0");
 }
-
-// generateId :: Integer -> String
-export function generateId (len: number) {
+function generateId(len: number) {
   var arr = new Uint8Array((len || 40) / 2);
   crypto.getRandomValues(arr);
   return Array.from(arr, dec2hex).join('');
 }
 
-export async function issueToken(jwtData: Payload, scope: string | null) {
+export async function issueToken(jwtData: JwtPayload, scope: string | null) {
   // We're actually making a token now
   const token = generateId(32);
   await dynamodb.executeStatement({

@@ -2,7 +2,7 @@ import { AttributeValue, dynamodb, ExecuteStatementInput } from "../deps.ts";
 import { presignGrabUrl, recordGrab } from "../lib/grab.ts";
 import { OciStore, RequestContext } from "./oci-store.ts";
 import { validateOidcJwt } from "./oidc.ts";
-import { generateId, issueToken, lookupToken } from "./tokens.ts";
+import { issueToken, lookupToken } from "./tokens.ts";
 
 export class OciStoreHelm implements OciStore {
 

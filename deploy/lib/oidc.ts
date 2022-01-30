@@ -1,4 +1,4 @@
-import { verify } from "https://deno.land/x/djwt@v2.4/mod.ts";
+import { verifyJwt } from "../deps.ts";
 
 export async function validateOidcJwt(jwt: string) {
   const parts = jwt.split('.');
@@ -44,7 +44,7 @@ export async function validateOidcJwt(jwt: string) {
     ['verify'],
   );
 
-  const payload = await verify(jwt, result);
+  const payload = await verifyJwt(jwt, result);
   console.log('Successfully validated JWT from', payload.sub);
   return payload;
 }

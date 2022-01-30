@@ -1,13 +1,8 @@
-// import { ApiFactory } from "https://deno.land/x/aws_api@v0.5.0/client/mod.ts";
-// import {
-//   DefaultCredentialsProvider,
-//   getDefaultRegion,
-// } from "https://deno.land/x/aws_api@v0.5.0/client/credentials.ts";
-import { ApiFactory } from "https://raw.githubusercontent.com/cloudydeno/deno-aws_api/e9a755913de0054473f272a85cccc340dbe5bf11/lib/client/mod.ts";
+import { ApiFactory } from "https://deno.land/x/aws_api@v0.6.0/client/mod.ts";
 import {
   DefaultCredentialsProvider,
   getDefaultRegion,
-} from "https://raw.githubusercontent.com/cloudydeno/deno-aws_api/e9a755913de0054473f272a85cccc340dbe5bf11/lib/client/credentials.ts";
+} from "https://deno.land/x/aws_api@v0.6.0/client/credentials.ts";
 
 export type { AttributeValue, ExecuteStatementInput } from "https://aws-api.deno.dev/v0.3/services/dynamodb.ts?actions=ExecuteStatement";
 import { DynamoDB } from "https://aws-api.deno.dev/v0.3/services/dynamodb.ts?actions=ExecuteStatement";
@@ -17,7 +12,10 @@ export const objectBucket = Deno.env.get('CHART_BUCKET');
 if (!objectBucket) throw `Envvar 'CHART_BUCKET' is required`;
 export const objectUrlPrefix = `s3://${objectBucket}/`;
 
-export { serve } from "https://deno.land/std@0.114.0/http/server.ts";
+export { serve } from "https://deno.land/std@0.120.0/http/server.ts";
+
+export { verify as verifyJwt } from "https://deno.land/x/djwt@v2.4/mod.ts";
+export type { Payload as JwtPayload } from "https://deno.land/x/djwt@v2.4/mod.ts";
 
 import {
   getSignedUrl,
