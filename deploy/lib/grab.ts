@@ -24,7 +24,7 @@ export async function recordGrab(opts: {
   httpHost: string,
   protocol: 'http' | 'oci',
 }) {
-  const expiryTimestamp = Math.floor(Date.now() / 1000) + (365 * 24 * 60);
+  const expiryTimestamp = Math.floor(Date.now() / 1000) + (365 * 24 * 60 * 60);
   await Promise.all([
 
     dynamodb.executeStatement({
