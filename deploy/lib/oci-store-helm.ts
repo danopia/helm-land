@@ -148,6 +148,7 @@ async function serveLayer(ctx: RequestContext, expectedType: string, digest: str
   if (actualType !== expectedType) return null;
 
   switch (layer.Type?.S) {
+    case 'application/vnd.oci.image.manifest.v1+json':
     case 'manifest.v1': return new Response(layer.Data?.S, {
       headers: {
         'content-type': 'application/vnd.oci.image.manifest.v1+json',
@@ -156,6 +157,7 @@ async function serveLayer(ctx: RequestContext, expectedType: string, digest: str
         'etag': `"${digest}"`,
         'x-content-type-options': 'nosniff',
       }});
+    case 'application/vnd.cncf.helm.config.v1+json':
     case 'config.v1': return new Response(layer.Data?.S, {
       headers: {
         'cache-control': 'max-age=31536000, public, immutable',
@@ -165,6 +167,7 @@ async function serveLayer(ctx: RequestContext, expectedType: string, digest: str
         'etag': `"${digest}"`,
         'x-content-type-options': 'nosniff',
       }});
+    case 'application/vnd.cncf.helm.chart.content.v1.tar+gzip':
     case 'content.v1': {
       const signedUrl = await presignGrabUrl(ctx.isHeadersOnly ? 'HEAD' : 'GET', layer.Storage?.SS ?? []);
       if (!signedUrl) return null;
