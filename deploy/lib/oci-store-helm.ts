@@ -13,6 +13,9 @@ export class OciStoreHelm implements OciStore {
 
   async checkAuthToken(ctx: RequestContext): Promise<boolean> {
     if (!ctx.bearerToken) return false;
+
+    if (ctx.bearerToken == 'public-pull' && ctx.action != 'push') return true;
+
     const tokenInfo = await lookupToken(ctx.bearerToken);
     if (!tokenInfo) return false;
 
