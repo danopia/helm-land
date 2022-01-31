@@ -96,7 +96,7 @@ resource "aws_dynamodb_table_item" "HelmOCI_dns-sync_0-1-0_config" {
     "ChartKey"     = { "S" = "cloudydeno/dns-sync" },
     "ChartVersion" = { "S" = "0.1.0" },
     "Digest"       = { "S" = "sha256:${sha256(local.config_0-1-0)}" },
-    "Type"         = { "S" = "config.v1" },
+    "Type"         = { "S" = "application/vnd.cncf.helm.config.v1+json" },
     "Data"         = { "S" = local.config_0-1-0 },
   })
 }
@@ -109,7 +109,7 @@ resource "aws_dynamodb_table_item" "HelmOCI_dns-sync_0-1-0_content" {
     "ChartKey"     = { "S" = "cloudydeno/dns-sync" },
     "ChartVersion" = { "S" = "0.1.0" },
     "Digest"       = { "S" = "sha256:${aws_s3_bucket_object.dns-sync_0-1-0.metadata.sha256}" },
-    "Type"         = { "S" = "content.v1" },
+    "Type"         = { "S" = "application/vnd.cncf.helm.chart.content.v1.tar+gzip" },
     "Storage" = { "SS" = [
       "s3://${aws_s3_bucket.main.id}/${aws_s3_bucket_object.dns-sync_0-1-0.key}?versionId=${aws_s3_bucket_object.dns-sync_0-1-0.version_id}",
     ] },
@@ -124,7 +124,7 @@ resource "aws_dynamodb_table_item" "HelmOCI_dns-sync_0-1-0_manifest" {
     "ChartKey"     = { "S" = "cloudydeno/dns-sync" },
     "ChartVersion" = { "S" = "0.1.0" },
     "Digest"       = { "S" = "sha256:${sha256(local.manifest_0-1-0)}" },
-    "Type"         = { "S" = "manifest.v1" },
+    "Type"         = { "S" = "application/vnd.oci.image.manifest.v1+json" },
     "Data"         = { "S" = local.manifest_0-1-0 },
   })
 }
