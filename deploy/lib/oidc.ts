@@ -7,9 +7,10 @@ export async function validateOidcJwt(jwt: string) {
   const issuer = dataPart.iss;
   if (typeof issuer !== 'string') throw new Error('bad iss');
   if (!issuer.startsWith('https://')) throw new Error('bad iss');
+  const issuerBase = issuer.replace(/\/*$/, '/');
 
   // https://token.actions.githubusercontent.com/.well-known/openid-configuration
-  const oidcConfig = await fetch(new URL('.well-known/openid-configuration', issuer)).then(x => x.json()) as {
+  const oidcConfig = await fetch(new URL('.well-known/openid-configuration', issuerBase)).then(x => x.json()) as {
     issuer: string;
     jwks_uri: string;
     subject_types_supported: string[];
@@ -19,7 +20,7 @@ export async function validateOidcJwt(jwt: string) {
     scopes_supported: string[];
   };
 
-  const jwksRaw = await fetch(oidcConfig.jwks_uri).then(x => x.json()) as {
+  const jwksRaw = await fetch(new URL(oidcConfig.jwks_uri)).then(x => x.json()) as {
     keys: Array<{
       n: string;
       kty: "RSA" | string;

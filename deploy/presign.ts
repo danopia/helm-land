@@ -1,7 +1,7 @@
 // fork of https://deno.land/x/aws_s3_presign@1.2.1/mod.ts
 // want to support dualstacking
 
-import { Sha256, HmacSha256 } from 'https://deno.land/std@0.120.0/hash/sha256.ts'
+import { HmacSha256, Sha256 } from "./deps.ts";
 
 const NEWLINE = '\n'
 

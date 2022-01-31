@@ -75,8 +75,8 @@ export async function renderIndexYaml(baseUrl: string, ownerId: string) {
       chunks.push(`    created: ${JSON.stringify(versionRecord.ReleasedAt?.S)}`);
       chunks.push(`    digest: ${JSON.stringify(versionRecord.Digest?.M?.sha256?.S)}`);
       chunks.push(`    urls:`);
-      for (const download of versionRecord.Download?.SS ?? []) {
-        if (download.startsWith(objectUrlPrefix)) {
+      for (const download of versionRecord.Download?.SS ?? ['internal']) {
+        if (download == 'internal' || download.startsWith(objectUrlPrefix)) {
           chunks.push(`    - ${JSON.stringify(`${baseUrl}${encodeURIComponent(`${name?.S}`)}/${encodeURIComponent(`${name?.S}`)}-${encodeURIComponent(`${version?.S}`)}.tgz`)}`);
         } else if (download.startsWith('https://')) {
           chunks.push(`    - ${JSON.stringify(download)}`);
