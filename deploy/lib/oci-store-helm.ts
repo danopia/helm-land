@@ -57,8 +57,12 @@ export class OciStoreHelm implements OciStore {
 
         switch (scopes.slice(-1)[0]) { // TODO
           case "repository:danopia/example:pull,push":
+          case "repository:cloudydeno/dns-sync:pull,push":
             if ( jwtData.iss === 'https://token.actions.githubusercontent.com'
               && jwtData.sub === 'repo:danopia/helm-land-push-test:ref:refs/heads/main'
+            ) break;
+            if ( jwtData.iss === 'https://token.actions.githubusercontent.com'
+              && jwtData.sub === 'repo:cloudydeno/kubernetes-dns-sync:ref:refs/heads/main'
             ) break;
             if ( jwtData.iss === 'https://danopia.net/kubernetes-identity'
               && jwtData.sub === 'system:serviceaccount:default:default'
