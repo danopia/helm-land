@@ -1,4 +1,6 @@
 #!/usr/bin/env -S deno run --allow-env --allow-net
+import "https://deno.land/x/observability@v0.4.0/preconfigured/from-environment.ts";
+import { httpTracer } from "https://deno.land/x/observability@v0.4.0/instrumentation/http-server.ts";
 import { serve } from "./deps.ts";
 
 import { renderIndexYaml } from "./routes/index-yaml.ts";
@@ -58,8 +60,8 @@ async function handler(req: Request) {
 }
 
 console.log("Listening on http://localhost:8000");
-await serve(async req => {
+await serve(httpTracer(async req => {
   const resp = await handler(req);
   console.log(resp.status, req.url);
   return resp;
-});
+}));
